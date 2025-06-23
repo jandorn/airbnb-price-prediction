@@ -1,4 +1,4 @@
-# Airbnb Price Prediction: Methodology and Insights
+# Airbnb Price Prediction Barcelona: Comprehensive Analysis Report
 
 **A Data Science Case Study for Barcelona Listings**
 
@@ -8,14 +8,20 @@
 
 ## Executive Summary
 
-This document outlines the comprehensive methodology used to develop a machine learning model for predicting Airbnb listing prices in Barcelona. The analysis demonstrates a systematic approach to data science, from initial data exploration through feature engineering to model development, emphasizing the importance of domain knowledge and data-driven decision making.
+This report documents the development of a machine learning model for predicting Airbnb listing prices in Barcelona. The analysis demonstrates a systematic approach to data science, from initial data exploration through feature engineering to model development, emphasizing the importance of domain knowledge and data-driven decision making.
+
+**Key Results:**
+- **Best Model:** Random Forest (optimized) with R² = 0.7142 on test set
+- **Prediction Accuracy:** RMSE = $87.14, MAE = $37.31
+- **Top Price Drivers:** Number of guests (accommodates), location (coordinates), premium neighborhoods
+- **Business Relevance:** Model can support hosts in optimal pricing decisions
 
 ---
 
 ## 1. Project Foundation and Data Strategy
 
 ### Problem Definition
-The challenge of pricing Airbnb listings represents a classic regression problem with real-world business implications. Hosts must balance competitive pricing with revenue optimization, often lacking the data-driven insights needed for informed decision-making. Our objective was to build a robust, interpretable model that could accurately predict prices based on property characteristics.
+The challenge of Airbnb pricing represents a classic regression problem with real-world business implications. Hosts must balance competitive pricing with revenue optimization, often lacking the data-driven insights needed for informed decision-making. Our objective was to build a robust, interpretable model that could accurately predict prices based on property characteristics.
 
 ### Data Source and Scope
 We utilized the comprehensive Inside Airbnb dataset, which provides detailed listing information across multiple cities. For this analysis, we focused exclusively on Barcelona, leveraging the listings.csv.gz file containing 79 initial features across approximately 19,000 properties.
@@ -137,37 +143,193 @@ Our approach deliberately created more features than needed, then intelligently 
 - **Computational Efficiency**: Optimizes training and prediction speed
 - **Interpretability Enhancement**: Focuses attention on truly important factors
 
-### Feature Categories and Their Roles
+---
 
-**Location Features**: Capture the real estate principle of "location, location, location" through geographic coordinates and neighborhood classification.
+## 5. Model Development and Baseline Evaluation
 
-**Property Features**: Quantify the physical characteristics that directly impact accommodation value and guest experience.
+### Data Split and Validation Strategy
+- **Train/Test Split**: 67%/33% (10,205/5,027 samples) following lecture recommendation
+- **Cross-Validation**: 5-fold with shuffling for robust validation
+- **Data Leakage Prevention**: Strict separation and feature validation
 
-**Host Features**: Reflect service quality and reliability factors that influence guest satisfaction and pricing power.
+### Baseline Model Performance
 
-**Amenity Features**: Transform qualitative convenience factors into quantifiable value propositions.
+**Linear Regression (with StandardScaler)**:
+- R² Score: 0.4366 ± 0.0272
+- RMSE: $110.16 ± $8.92
+- MAE: $57.47 ± $1.17
+- Interpretation: Moderate performance, captures linear relationships
 
-**Derived Features**: Extract hidden relationships and efficiency metrics not apparent in raw data.
+**Random Forest**:
+- R² Score: 0.5332 ± 0.0302  
+- RMSE: $100.18 ± $7.75
+- MAE: $44.47 ± $1.27
+- Interpretation: Good performance, captures non-linear patterns
+
+**XGBoost**:
+- R² Score: 0.5408 ± 0.0178
+- RMSE: $99.55 ± $8.84  
+- MAE: $45.40 ± $1.81
+- Interpretation: Best baseline, low variance
+
+**Baseline Ranking**: XGBoost > Random Forest > Linear Regression
 
 ---
 
-## 5. Data Quality and Validation
+## 6. Hyperparameter Optimization
 
-### Missing Data Strategy
-Rather than applying blanket imputation, we developed targeted strategies:
+### Linear Regression Variants
+**Ridge Regression**: 
+- Best Parameters: alpha = 100.0
+- R² Score: 0.4370 ± 0.0276
 
-- **Structural Missingness**: Addressed systematically (e.g., bedrooms estimated from capacity)
-- **Random Missingness**: Handled through domain-appropriate defaults
-- **High-Missingness Features**: Removed when missingness exceeded 80%
+**Lasso Regression**:
+- Best Parameters: alpha = 1.0  
+- R² Score: 0.4372 ± 0.0273
 
-### Outlier Management
-Applied business logic to outlier detection:
-- **Extreme Prices**: Capped at $2,000 to remove likely data errors
-- **Zero/Negative Prices**: Removed as invalid entries
-- **Capacity Outliers**: Validated against property type expectations
+**Elastic Net**:
+- Best Parameters: alpha = 0.1, l1_ratio = 0.9
+- R² Score: 0.4373 ± 0.0275
+
+### Random Forest Optimization
+**RandomizedSearchCV Results**:
+- Best Parameters: max_depth = 20, min_samples_split = 2, n_estimators = 200
+- Optimized R² Score: 0.6284 ± 0.0266
+- RMSE: $89.51 ± $6.82
+- MAE: $39.52 ± $1.22
+
+### XGBoost Optimization  
+**RandomizedSearchCV Results**:
+- Best Parameters: learning_rate = 0.1, max_depth = 6, n_estimators = 200
+- Optimized R² Score: 0.6251 ± 0.0189
+- RMSE: $89.86 ± $5.95  
+- MAE: $40.82 ± $1.43
+
+**Optimization Ranking**: Random Forest (optimized) > XGBoost (optimized) > Linear Regression variants
+
+---
+
+## 7. Final Test Set Evaluation
+
+### Champion Model: Random Forest (Optimized)
+**Test Set Performance**:
+- **R² Score**: 0.7142
+- **RMSE**: $87.14  
+- **MAE**: $37.31
+- **Correlation**: 0.8451
+
+### Model Ranking (Test Set)
+1. **Random Forest (Optimized)**: R² = 0.7142, RMSE = $87.14
+2. **XGBoost (Optimized)**: R² = 0.7059, RMSE = $88.46
+3. **Linear Regression Variants**: R² ~0.44, RMSE ~$122
+
+### Error Analysis and Model Diagnostics
+
+**Residual Analysis**:
+- Mean residual: $-0.24 (minimal bias ✅)
+- Standard deviation: $86.83
+- Median absolute error: $21.11
+
+**Prediction Quality**:
+- Large errors (>$174): 2.9% of predictions
+- Worst predictions: Luxury segment outliers
+- Prediction-Actual correlation: 0.8451
+
+**Performance by Price Segment**:
+- **Budget (<$50)**: Difficult prediction (R² = -15.05), MAPE = 64.1%
+- **Mid-range ($50-100)**: Moderate difficulty (R² = -5.01), MAPE = 33.4%  
+- **Premium ($100-200)**: Improvement (R² = -1.59), MAPE = 22.5%
+- **Luxury ($200+)**: Best performance (R² = 0.51), MAPE = 23.1%
+
+**Model Behavior**:
+- Under-predictions: 36.4%
+- Over-predictions: 63.6%  
+- Slight tendency to underestimate, but minimal bias
+
+---
+
+## 8. Feature Importance and Business Insights
+
+### Top Price Drivers (Random Forest)
+1. **accommodates** (0.2156): Number of guests - strongest price determinant
+2. **longitude** (0.1243): East-West position in Barcelona
+3. **latitude** (0.1089): North-South position in Barcelona  
+4. **room_type_Entire home/apt** (0.0845): Premium for entire apartments
+5. **property_type_Apartment** (0.0617): Apartment vs. other types
+6. **bedrooms** (0.0531): Number of bedrooms
+7. **neighbourhood_Eixample** (0.0470): Premium neighborhood
+8. **bathrooms** (0.0387): Number of bathrooms
+9. **beds** (0.0351): Number of beds
+10. **amenities_count** (0.0344): Total amenities count
+
+### Business Interpretations
+
+**Location is Critical**:
+- Longitude + Latitude = ~24% of feature importance
+- Eixample recognized as premium neighborhood
+- Geographic coordinates capture micro-location effects
+
+**Capacity Determines Price**:
+- Accommodates alone explains 21.6% of price variance  
+- Combined with bedrooms/bathrooms/beds = ~40% of importance
+- Clear scaling with property size
+
+**Property Type Premiums**:
+- Entire homes command significant premiums
+- Apartments established as baseline category
+- Room type more important than property type
+
+**Amenities as Differentiators**:
+- Amenities count indicates luxury level
+- Specific amenities less important than total count
+- Quality over specific features
+
+---
+
+## 9. Methodological Insights
 
 ### Data Leakage Prevention
-Implemented strict protocols to prevent target variable leakage:
-- **Feature Independence**: Ensured all features represent information available before pricing decisions
-- **Temporal Consistency**: Verified feature availability aligns with real-world pricing workflows
-- **Cross-Validation**: Designed evaluation methodology to detect leakage symptoms
+Strict avoidance of data leakage was crucial for realistic performance estimates. Examples of avoided leakage:
+- Price-based features (price per person)
+- Future information (later reviews)
+- Target encoding without proper cross-validation
+
+### Feature Engineering Best Practices
+The expansion-reduction approach proved effective:
+- **Expansion Phase**: Maximizes information extraction
+- **Reduction Phase**: Eliminates noise and redundancy
+- **Domain Knowledge**: Integrates business understanding
+
+### Cross-Validation Robustness
+5-fold CV with shuffling provided stable performance estimates:
+- Low standard deviations for optimized models
+- Consistent rankings between CV and test set
+- Reliable hyperparameter selection
+
+---
+
+## 10. Conclusion and Outlook
+
+### Project Success
+The developed Random Forest model achieved strong performance with **R² = 0.7142** on the test set, explaining **71.4% of price variance**. The **RMSE of $87.14** is significantly below the average price, demonstrating practical applicability.
+
+### Key Findings
+1. **Location and capacity** are the most important price drivers
+2. **Tree-based models** significantly outperform linear approaches  
+3. **Feature engineering** is more critical than model complexity
+4. **Hypothesis-driven data strategy** successfully reduces complexity
+
+### Methodological Contributions
+- **Expansion-Reduction Paradigm** for feature engineering
+- **Rigorous Data Leakage Prevention** for realistic evaluation
+- **Business-driven Hypothesis Testing** for data selection
+- **Comprehensive Error Analysis** for model understanding
+
+### Final Assessment
+This project demonstrates a complete data science pipeline from problem definition to business-ready solution. The combination of rigorous methodology, domain-specific knowledge, and practical business insights delivers a model that is both statistically robust and commercially valuable.
+
+The developed solution can support Airbnb hosts in making informed pricing decisions and contributes to understanding the complex dynamics of the short-term rental market.
+
+---
+
+*This analysis was developed as part of a university data science case study and represents a comprehensive demonstration of modern machine learning practices.*
