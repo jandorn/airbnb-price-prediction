@@ -11,9 +11,9 @@
 This report documents the development of a machine learning model for predicting Airbnb listing prices in Barcelona. The analysis demonstrates a systematic approach to data science, from initial data exploration through feature engineering to model development, emphasizing the importance of domain knowledge and data-driven decision making.
 
 **Key Results:**
-- **Best Model:** Random Forest (optimized) with R² = 0.7142 on test set
-- **Prediction Accuracy:** RMSE = $87.14, MAE = $37.31
-- **Top Price Drivers:** Number of guests (accommodates), location (coordinates), premium neighborhoods
+- **Best Model:** Random Forest (optimized) with R² = 0.6183 on test set
+- **Prediction Accuracy:** RMSE = $93.27, MAE = $42.27
+- **Top Price Drivers:** Number of guests (accommodates), bathroom count, bedrooms
 - **Business Relevance:** Model can support hosts in optimal pricing decisions
 
 ---
@@ -46,7 +46,7 @@ The initial exploration revealed a rich but complex dataset with significant het
 - **Scale**: 19,422 listings with 79 features
 - **Data Quality**: Varying levels of completeness across features
 - **Feature Types**: Mix of numerical, categorical, and text data
-- **Memory Footprint**: 82.7 MB requiring careful processing
+- **Memory Footprint**: 77.7 MB requiring careful processing
 
 ### Target Variable Analysis
 Price distribution analysis revealed crucial insights:
@@ -155,24 +155,24 @@ Our approach deliberately created more features than needed, then intelligently 
 ### Baseline Model Performance
 
 **Linear Regression (with StandardScaler)**:
-- R² Score: 0.4366 ± 0.0272
-- RMSE: $110.16 ± $8.92
-- MAE: $57.47 ± $1.17
+- R² Score: 0.4704 ± 0.0503
+- RMSE: $109.53 ± $11.43
+- MAE: $58.83 ± $2.29
 - Interpretation: Moderate performance, captures linear relationships
 
 **Random Forest**:
-- R² Score: 0.5332 ± 0.0302  
-- RMSE: $100.18 ± $7.75
-- MAE: $44.47 ± $1.27
+- R² Score: 0.6023 ± 0.0557
+- RMSE: $94.75 ± $11.03
+- MAE: $43.66 ± $1.52
 - Interpretation: Good performance, captures non-linear patterns
 
 **XGBoost**:
-- R² Score: 0.5408 ± 0.0178
-- RMSE: $99.55 ± $8.84  
-- MAE: $45.40 ± $1.81
-- Interpretation: Best baseline, low variance
+- R² Score: 0.6023 ± 0.0445
+- RMSE: $94.86 ± $10.04
+- MAE: $44.46 ± $1.49
+- Interpretation: Equal performance to Random Forest
 
-**Baseline Ranking**: XGBoost > Random Forest > Linear Regression
+**Baseline Ranking**: Random Forest > XGBoost > Linear Regression
 
 ---
 
@@ -181,29 +181,42 @@ Our approach deliberately created more features than needed, then intelligently 
 ### Linear Regression Variants
 **Ridge Regression**: 
 - Best Parameters: alpha = 100.0
-- R² Score: 0.4370 ± 0.0276
+- R² Score: 0.4706 ± 0.0502
 
 **Lasso Regression**:
-- Best Parameters: alpha = 1.0  
-- R² Score: 0.4372 ± 0.0273
+- Best Parameters: alpha = 0.1
+- R² Score: 0.4708 ± 0.0503
 
 **Elastic Net**:
 - Best Parameters: alpha = 0.1, l1_ratio = 0.9
-- R² Score: 0.4373 ± 0.0275
+- R² Score: 0.4708 ± 0.0502
 
 ### Random Forest Optimization
 **RandomizedSearchCV Results**:
-- Best Parameters: max_depth = 20, min_samples_split = 2, n_estimators = 200
-- Optimized R² Score: 0.6284 ± 0.0266
-- RMSE: $89.51 ± $6.82
-- MAE: $39.52 ± $1.22
+- Best Parameters: 
+  - n_estimators: 200
+  - min_samples_split: 5
+  - min_samples_leaf: 1
+  - max_features: sqrt
+  - max_depth: 20
+  - bootstrap: False
+- Optimized R² Score: 0.6414 ± 0.0445
+- RMSE: $90.10 ± $10.50
+- MAE: $41.50 ± $1.20
 
 ### XGBoost Optimization  
 **RandomizedSearchCV Results**:
-- Best Parameters: learning_rate = 0.1, max_depth = 6, n_estimators = 200
-- Optimized R² Score: 0.6251 ± 0.0189
-- RMSE: $89.86 ± $5.95  
-- MAE: $40.82 ± $1.43
+- Best Parameters:
+  - subsample: 0.7
+  - reg_lambda: 1.0
+  - reg_alpha: 0.1
+  - n_estimators: 300
+  - max_depth: 7
+  - learning_rate: 0.05
+  - colsample_bytree: 0.7
+- Optimized R² Score: 0.6389 ± 0.0448
+- RMSE: $90.38 ± $10.28
+- MAE: $42.26 ± $1.22
 
 **Optimization Ranking**: Random Forest (optimized) > XGBoost (optimized) > Linear Regression variants
 
@@ -213,76 +226,75 @@ Our approach deliberately created more features than needed, then intelligently 
 
 ### Champion Model: Random Forest (Optimized)
 **Test Set Performance**:
-- **R² Score**: 0.7142
-- **RMSE**: $87.14  
-- **MAE**: $37.31
+- **R² Score**: 0.6183
+- **RMSE**: $93.27
+- **MAE**: $42.27
 - **Correlation**: 0.8451
 
 ### Model Ranking (Test Set)
-1. **Random Forest (Optimized)**: R² = 0.7142, RMSE = $87.14
-2. **XGBoost (Optimized)**: R² = 0.7059, RMSE = $88.46
-3. **Linear Regression Variants**: R² ~0.44, RMSE ~$122
+1. **Random Forest (Optimized)**: R² = 0.6183, RMSE = $93.27
+2. **XGBoost (Optimized)**: R² = 0.6147, RMSE = $93.70
+3. **Linear Regression (ElasticNet)**: R² = 0.4277, RMSE = $114.20
 
 ### Error Analysis and Model Diagnostics
+Detailed analysis of champion model: Random Forest (Optimized)
 
-**Residual Analysis**:
-- Mean residual: $-0.24 (minimal bias ✅)
-- Standard deviation: $86.83
-- Median absolute error: $21.11
+#### Visual Analysis
+![Actual vs Predicted Plot](../images/actual_vs_predicted.png)
+![Residual Plot](../images/residual_plot.png)
 
-**Prediction Quality**:
-- Large errors (>$174): 2.9% of predictions
-- Worst predictions: Luxury segment outliers
-- Prediction-Actual correlation: 0.8451
+#### Comprehensive Error Statistics
 
-**Performance by Price Segment**:
-- **Budget (<$50)**: Difficult prediction (R² = -15.05), MAPE = 64.1%
-- **Mid-range ($50-100)**: Moderate difficulty (R² = -5.01), MAPE = 33.4%  
-- **Premium ($100-200)**: Improvement (R² = -1.59), MAPE = 22.5%
-- **Luxury ($200+)**: Best performance (R² = 0.51), MAPE = 23.1%
+| Metric | Overall | Budget (<$50) | Mid-range ($50-100) | Premium ($100-200) | Luxury ($200+) |
+|--------|----------|---------------|-------------------|------------------|--------------|
+| Sample Size | 5,027 | 716 | 1,415 | 1,875 | 1,021 |
+| R² Score | 0.6183 | -13.2630 | -7.6234 | -1.7197 | 0.3324 |
+| MAE | $42.27 | $20.41 | $24.97 | $31.23 | $101.86 |
+| Sample Share | 100% | 14.2% | 28.1% | 37.3% | 20.3% |
 
-**Model Behavior**:
-- Under-predictions: 36.4%
-- Over-predictions: 63.6%  
-- Slight tendency to underestimate, but minimal bias
+#### Price Range Analysis
+- **Distribution of Predictions**:
+  - Under-predictions: 36.4%
+  - Over-predictions: 63.6%
+  - Slight tendency to overestimate prices
 
 ---
 
 ## 8. Feature Importance and Business Insights
 
 ### Top Price Drivers (Random Forest)
-1. **accommodates** (0.2156): Number of guests - strongest price determinant
-2. **longitude** (0.1243): East-West position in Barcelona
-3. **latitude** (0.1089): North-South position in Barcelona  
-4. **room_type_Entire home/apt** (0.0845): Premium for entire apartments
-5. **property_type_Apartment** (0.0617): Apartment vs. other types
-6. **bedrooms** (0.0531): Number of bedrooms
-7. **neighbourhood_Eixample** (0.0470): Premium neighborhood
-8. **bathrooms** (0.0387): Number of bathrooms
-9. **beds** (0.0351): Number of beds
-10. **amenities_count** (0.0344): Total amenities count
+1. **accommodates** (0.1482): Number of guests - strongest price determinant
+2. **bathrooms_count** (0.1173): Number of bathrooms
+3. **bedrooms** (0.1095): Number of bedrooms
+4. **minimum_nights** (0.0444): Minimum stay requirement
+5. **host_listings_count** (0.0436): Host's total listings
+6. **availability_365** (0.0387): Annual availability
+7. **bathrooms_per_guest** (0.0380): Bathroom-to-guest ratio
+8. **longitude** (0.0353): East-West position
+9. **total_amenities** (0.0340): Total amenities count
+10. **room_type_encoded** (0.0316): Type of room
 
 ### Business Interpretations
 
-**Location is Critical**:
-- Longitude + Latitude = ~24% of feature importance
-- Eixample recognized as premium neighborhood
-- Geographic coordinates capture micro-location effects
+**Property Characteristics Drive Price**:
+- Accommodates, bathrooms, and bedrooms explain ~38% of price variance
+- Strong correlation between capacity and price
+- Bathroom count is second most important feature (11.7%)
 
-**Capacity Determines Price**:
-- Accommodates alone explains 21.6% of price variance  
-- Combined with bedrooms/bathrooms/beds = ~40% of importance
-- Clear scaling with property size
+**Booking Flexibility Matters**:
+- Minimum nights requirement has significant impact (4.4%)
+- Availability and booking patterns influence pricing
+- Host's experience (listings count) affects pricing strategy
 
-**Property Type Premiums**:
-- Entire homes command significant premiums
-- Apartments established as baseline category
-- Room type more important than property type
+**Location Less Critical Than Expected**:
+- Longitude only explains 3.5% of price variance
+- Neighborhood effects captured through other features
+- Geographic position less important than property features
 
-**Amenities as Differentiators**:
-- Amenities count indicates luxury level
-- Specific amenities less important than total count
-- Quality over specific features
+**Amenities as Supporting Factor**:
+- Total amenities count influences price (3.4%)
+- Quality indicators like bathroom-to-guest ratio matter
+- Focus on overall property quality over specific features
 
 ---
 
@@ -311,7 +323,7 @@ The expansion-reduction approach proved effective:
 ## 10. Conclusion and Outlook
 
 ### Project Success
-The developed Random Forest model achieved strong performance with **R² = 0.7142** on the test set, explaining **71.4% of price variance**. The **RMSE of $87.14** is significantly below the average price, demonstrating practical applicability.
+The developed Random Forest model achieved strong performance with **R² = 0.6183** on the test set, explaining **61.8% of price variance**. The **RMSE of $93.27** is significantly below the average price, demonstrating practical applicability.
 
 ### Key Findings
 1. **Location and capacity** are the most important price drivers
