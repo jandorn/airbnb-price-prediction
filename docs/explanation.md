@@ -326,10 +326,8 @@ The expansion-reduction approach proved effective:
 The developed Random Forest model achieved strong performance with **R² = 0.6183** on the test set, explaining **61.8% of price variance**. The **RMSE of $93.27** is significantly below the average price, demonstrating practical applicability.
 
 ### Key Findings
-1. **Location and capacity** are the most important price drivers
-2. **Tree-based models** significantly outperform linear approaches  
-3. **Feature engineering** is more critical than model complexity
-4. **Hypothesis-driven data strategy** successfully reduces complexity
+1. **Tree-based models** significantly outperform linear approaches in this case 
+2. **Feature engineering** is more critical than model complexity
 
 ### Methodological Contributions
 - **Expansion-Reduction Paradigm** for feature engineering
