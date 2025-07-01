@@ -11,14 +11,14 @@ This project develops a machine learning model to predict Airbnb listing prices 
 **Methodology:**
 - **Data Strategy**: Hypothesis-driven approach excluding reviews and calendar data based on analysis showing minimal predictive value
 - **Feature Engineering**: Three-phase expansion-reduction paradigm (79 → 17 → ~70 → 53 features) with careful data leakage prevention
-- **Modeling**: Comparison of Linear Regression, Random Forest, and XGBoost with hyperparameter optimization
+- **Modeling**: Comparison of **Linear Regression**, **Random Forest**, and **XGBoost** with hyperparameter optimization
 - **Evaluation**: Rigorous cross-validation and comprehensive error analysis on unseen test data
 
 **Key Findings:**
-- **Champion Model**: Random Forest achieved **R² = 0.7142** (71.4% variance explained) with **RMSE = $87.14**
-- **Top Price Drivers**: Guest capacity (21.6%), geographic location (24%), room type, and neighborhood premiums
-- **Business Insights**: Location and capacity are paramount; entire homes command significant premiums; amenities count matters more than specific features
-- **Practical Impact**: Model enables data-driven pricing decisions with median absolute error of only $21.11
+- **Champion Model**: Random Forest achieved **R² = 0.6183** (61.8% variance explained) with **RMSE = $93.27**
+- **Top Price Drivers**: Guest capacity (14.8%), bathroom count (11.7%), bedrooms (11.0%)
+- **Business Insights**: Property capacity and amenities are paramount; entire homes command significant premiums
+- **Practical Impact**: Model enables data-driven pricing decisions with median absolute error of $42.27
 
 ## Quick Start
 
@@ -47,17 +47,23 @@ Open `price_prediction_barcelona.ipynb` in Jupyter and execute all cells.
 
 ## Results Summary
 
-| Model | R² Score | RMSE ($) | MAE ($) |
-|-------|----------|----------|---------|
-| **Random Forest (Optimized)** | **0.7142** | **87.14** | **37.31** |
-| XGBoost (Optimized) | 0.7059 | 88.46 | 39.18 |
-| Linear Regression | 0.4373 | 110.10 | 57.23 |
+| Model | Stage | R² Score | RMSE ($) | MAE ($) |
+|-------|--------|----------|----------|---------|
+| Random Forest | Baseline CV | 0.6023 ± 0.0557 | 94.75 ± 11.03 | 43.66 ± 1.52 |
+| | Optimized CV | 0.6414 ± 0.0445 | 90.10 ± 10.50 | 41.50 ± 1.20 |
+| | **Test** | **0.6183** | **93.27** | **42.27** |
+| XGBoost | Baseline CV | 0.6023 ± 0.0445 | 94.86 ± 10.04 | 44.46 ± 1.49 |
+| | Optimized CV | 0.6389 ± 0.0448 | 90.38 ± 10.28 | 42.26 ± 1.22 |
+| | Test | 0.6147 | 93.70 | 43.39 |
+| Linear Regression | Baseline CV | 0.4704 ± 0.0503 | 109.53 ± 11.43 | 58.83 ± 2.29 |
+| | ElasticNet CV | 0.4708 ± 0.0502 | 109.49 ± 11.47 | 58.58 ± 2.29 |
+| | Test | 0.4277 | 114.20 | 60.33 |
 
 **Model Performance by Price Segment:**
-- Budget (<$50): Challenging (MAPE: 64.1%)
-- Mid-range ($50-100): Moderate (MAPE: 33.4%)
-- Premium ($100-200): Good (MAPE: 22.5%)
-- Luxury ($200+): Best (MAPE: 23.1%)
+- Budget (<$50): R² = -13.26, MAE = $20.41, n = 716
+- Mid-range ($50-100): R² = -7.62, MAE = $24.97, n = 1,415
+- Premium ($100-200): R² = -1.72, MAE = $31.23, n = 1,875
+- Luxury ($200+): R² = 0.33, MAE = $101.86, n = 1,021
 
 ## Documentation
 
