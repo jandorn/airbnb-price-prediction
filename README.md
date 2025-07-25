@@ -29,8 +29,15 @@ cd airbnb-price-prediction
 ```
 
 2. **Download data**:
+
+macOS / Linux:
 ```bash
 ./download_data.sh
+```
+
+Windows (PowerShell):
+```powershell
+.\download_data.ps1
 ```
 
 3. **Run analysis**:
