@@ -11,8 +11,8 @@
 This report documents the development of a machine learning model for predicting Airbnb listing prices in Barcelona. The analysis demonstrates a systematic approach to data science, from initial data exploration through feature engineering to model development, emphasizing the importance of domain knowledge and data-driven decision making.
 
 **Key Results:**
-- **Best Model:** Random Forest (optimized) with R² = 0.6183 on test set
-- **Prediction Accuracy:** RMSE = $93.27, MAE = $42.27
+- **Best Model:** Random Forest (optimized) with R² = 0.6292 on test set
+- **Prediction Accuracy:** RMSE = $91.92, MAE = $40.74
 - **Top Price Drivers:** Number of guests (accommodates), bathroom count, bedrooms
 - **Business Relevance:** Model can support hosts in optimal pricing decisions
 
@@ -226,14 +226,14 @@ Our approach deliberately created more features than needed, then intelligently 
 
 ### Champion Model: Random Forest (Optimized)
 **Test Set Performance**:
-- **R² Score**: 0.6183
-- **RMSE**: $93.27
-- **MAE**: $42.27
+- **R² Score**: 0.6292
+- **RMSE**: $91.92
+- **MAE**: $40.74
 - **Correlation**: 0.8451
 
 ### Model Ranking (Test Set)
-1. **Random Forest (Optimized)**: R² = 0.6183, RMSE = $93.27
-2. **XGBoost (Optimized)**: R² = 0.6147, RMSE = $93.70
+1. **Random Forest (Optimized)**: R² = 0.6292, RMSE = $91.92
+2. **XGBoost (Optimized)**: R² = 0.6181, RMSE = $93.29
 3. **Linear Regression (ElasticNet)**: R² = 0.4277, RMSE = $114.20
 
 ### Error Analysis and Model Diagnostics
@@ -248,8 +248,8 @@ Detailed analysis of champion model: Random Forest (Optimized)
 | Metric | Overall | Budget (<$50) | Mid-range ($50-100) | Premium ($100-200) | Luxury ($200+) |
 |--------|----------|---------------|-------------------|------------------|--------------|
 | Sample Size | 5,027 | 716 | 1,415 | 1,875 | 1,021 |
-| R² Score | 0.6183 | -13.2630 | -7.6234 | -1.7197 | 0.3324 |
-| MAE | $42.27 | $20.41 | $24.97 | $31.23 | $101.86 |
+| R² Score | 0.6292 | -12.4294 | -9.1754 | -1.6697 | 0.3611 |
+| MAE | $40.74 | $19.37 | $24.27 | $30.19 | $97.92 |
 | Sample Share | 100% | 14.2% | 28.1% | 37.3% | 20.3% |
 
 #### Price Range Analysis
@@ -323,7 +323,7 @@ The expansion-reduction approach proved effective:
 ## 10. Conclusion and Outlook
 
 ### Project Success
-The developed Random Forest model achieved strong performance with **R² = 0.6183** on the test set, explaining **61.8% of price variance**. The **RMSE of $93.27** is significantly below the average price, demonstrating practical applicability.
+The developed Random Forest model achieved strong performance with **R² = 0.6292** on the test set, explaining **62.9% of price variance**. The **RMSE of $91.92** is significantly below the average price, demonstrating practical applicability.
 
 ### Key Findings
 1. **Tree-based models** significantly outperform linear approaches in this case 
